@@ -32,7 +32,7 @@ disp('Debiasing')
 
 disp('Saving:')
 
-filename = ['/scratch/gpfs/eitanl/pure_noist_test_microNum_' num2str(num_micros) '_M_' num2str(M) '_L_' num2str(L) '_sigma_' num2str(sigma) '.mat'];
+filename = ['pure_noist_test_microNum_' num2str(num_micros) '_M_' num2str(M) '_L_' num2str(L) '_sigma_' num2str(sigma) '.mat'];
 disp(['Filename: ' filename])
 
 save(filename, 'm1', 'm2', 'm3', 'seed', 'sigma', 'M')

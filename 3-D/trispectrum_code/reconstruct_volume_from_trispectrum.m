@@ -53,7 +53,7 @@ if isempty(gcp('nocreate')), parpool(maxNumCompThreads); end
     M4_quants.D_mats, info.L0, k_max);
 
 % Compute bispectrum:
-load('/scratch/network/eitanl/B_factors_bispect_maxL5_L21.mat', 'B', 'B_lists', 'W')
+load(['B_factors_bispect_maxL' num2str(info.maxL) '_L' num2str(info.L0) '.mat'], 'B', 'B_lists', 'W')
 
 [G1, G2, G3] = bispectrum_grad_from_harmonics...
         (a_lms, B, W, B_lists.L1, B_lists.L2, B_lists.L3, x_lists.L, x_lists.m, x_lists.s, B_lists.blk_id);

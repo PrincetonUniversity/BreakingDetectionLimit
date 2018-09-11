@@ -3,7 +3,6 @@
 %% Paths:
 addpath('PATH TO kam_Cryo')
 addpath('PATH TO SPHERICAL HARMONICS TOOLBOX')
-addpath('PATH TO PSWF TOOLBOX')
 addpath('PATH TO EASYSPIN')
 addpath('PATH TO ASPIRE')
 initpath
@@ -25,4 +24,4 @@ B_lists.L2 = L2_list;
 B_lists.L3 = L3_list;
 B_lists.blk_id = blk_id;
 
-save(['/scratch/network/eitanl/B_factors_bispect_maxL' num2str(maxL) '_L' num2str(L) '.mat'], '-v7.3')
+save(['B_factors_bispect_maxL' num2str(maxL) '_L' num2str(L) '.mat'], '-v7.3')

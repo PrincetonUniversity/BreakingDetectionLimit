@@ -5,7 +5,6 @@
 clear all; close all;
 addpath('PATH TO kam_cryo REPO')
 addpath('PATH TO SPHERICAL HARMONIC TOOLBOX')
-addpath('PATH TO PSWF TOOLBOX')
 addpath('PATH TO ASPIRE TOOLBOX')
 initpath
 

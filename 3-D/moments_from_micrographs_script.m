@@ -6,7 +6,6 @@ addpath('PATH TO kam_cryo TOOLBOX')
 addpath('PATH TO SPHERICAL HARMONICS TOOLBOX')
 addpath('PATH TO ASPIRE TOOLBOX')
 initpath
-addpath('PATH TO PSWF TOOLBOX')
 
 %% Set parameters, load micrograph
 % SNR = 1/1024;
@@ -70,8 +69,7 @@ end
 
 disp('Saving:')
 
-filename = ['/scratch/gpfs/eitanl/1qlq_crop_' num2str(num_micros)...
-    '_M_' num2str(M) '_noisy_moments_SNR_' num2str(SNR) '.mat'];
+filename = ['1qlq_crop_' num2str(num_micros) '_M_' num2str(M) '_noisy_moments_SNR_' num2str(SNR) '.mat'];
 
 disp(['Filename: ' filename])
 
