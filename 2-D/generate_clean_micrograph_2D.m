@@ -1,13 +1,8 @@
 function [Y, placed] = generate_clean_micrograph_2D(X, param)
+
 % Inputs:
 %   X: signal of size LxL
-%   W: separation zone has size WxW: any square of that size can only touch
-%      one signal occurence.
-%   N: micrograph has size NxN
-%   m: the signal will appear m times in the micrograph, in random places,
-%      with separation specified by W. If it proves difficult to place m
-%      copies of the signal obeying that rule, the number of copies may be
-%      smaller.
+%   parameters : the parameters define the problem
 %
 % Outputs:
 %   Y: micrograph of size NxN (clean)
