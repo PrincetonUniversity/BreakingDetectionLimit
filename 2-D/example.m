@@ -1,6 +1,5 @@
 % September 2018
 % https://github.com/PrincetonUniversity/BreakingDetectionLimit
-
 clear;
 close all;
 clc;
@@ -9,61 +8,71 @@ clc;
 seed_rng = rng(57489754);
 
 % use multiple workers if available 
+NumWorkers = 2;
 if isempty(gcp('nocreate'))
-    parpool(72,'IdleTimeout', 240);
+    parpool(NumWorkers,'IdleTimeout', 240);
 end
 
 %% Define the problem
 
 % input image size
 L = 50;
-
 W = 2*L-1;
-% Load a grayscale image of size LxL, removing the mean and scale between -1 and 1.
+
+% load a grayscale image of size LxL, removing the mean and scale between -1 and 1.
 X = double(rgb2gray(imread('Einstein5_small.jpg')));
 X = X - mean(X(:));
 X = X/max(abs(X(:)));
 X = imresize(X, [L, L]);
-% Zero padded signal
+
+% zero padded signal
 X_zp = [X zeros(L, W-L) ; zeros(W-L, W)];
-% Computing the underlying(of the zero padded image) power spectrum
+
+% computing the underlying (of the zero padded image) power spectrum
 PSX = abs(fft2(X_zp)).^2;
 
-%noise level
+% noise level
 sigma = 3; 
-%Desired number of occurrences of the image X in each micrograph. 
-%Because of the separation condition, it might be impossible to obtain so
-%many occurrences. 
+
+% Desired number of occurrences of the image X in each micrograph. 
+% Because of the separation condition, it might be impossible to obtain so
+% many occurrences. 
 m_want = 1000; 
+
 % Number of micrographs in each iterations. More micrographs in each batch implies more
 % efficient computations. 
 micrograph_batch = 200; 
+
 % Number of batches (= epochs) of micrographs. 
 %Total number of micrographs =  micrograph_batch * epochs.
 epochs = 1000;
+
 % Each micrograph is a squared image of size NxN
 N = 4096; 
+
 % Threshold for the RRR algorithm. In this experiment, we set it to zero
 % so all experiments stop after the same number of iterations.
 th = 0; 
+
 % Maximum number of iterations for the RRR algorithm
 max_iter = 2000; 
+
 % What images to present in the figures. 
-%We chose to present:
-%[micrograph_batch, micrograph_batch*10, micrograph_batch*100, micrograph_batch*1000]
+% We chose to present:
+% [micrograph_batch, micrograph_batch*10, micrograph_batch*100, micrograph_batch*1000]
 ind2save = [1,10,100,1000];
 
-%Initialize variables
+% initialize variables
 err_PS = zeros(epochs,1);
 err_rrr = zeros(epochs,max_iter);
 
-% Random initialization for the RRR algorithm
+% random initialization for the RRR algorithm
 Xs = randn(L);
 Xs = Xs - mean(Xs(:));
 X_init = zeros(W);
 X_init(1:L,1:L) = Xs;
 
-% Save all parameters 
+% save all parameters 
 save('parameters');
 
 %% Generate the micrographs and collect their moments
@@ -81,7 +90,7 @@ param.max_iter = max_iter;
 m = zeros(epochs,1);
 for iter = 1:epochs
     
-    % Generate micrographs
+    % generate micrographs
     Y_obs = zeros(N,N,micrograph_batch);
     tic;
     m_eff = zeros(micrograph_batch,1);
@@ -94,7 +103,7 @@ for iter = 1:epochs
     m(iter) = sum(m_eff);
     tic
     
-    % Compute the power spectrum (second-order moment) of a batch of
+    % compute the power spectrum (second-order moment) of a batch of
     % micrographs
     M2_micrograph = computeM2(Y_obs,m_eff,param);
     fprintf('time to compute moments = %.4g [sec] \n', toc);
@@ -105,19 +114,17 @@ for iter = 1:epochs
         M2 = M2 + M2_micrograph;
     end
     PS = fft2(M2/iter);
-    
-    % Relative error of power spectrum estimation
     err_PS(iter) = norm(PSX(:) - PS(:))/norm(PSX(:));
     fprintf('error PS = %.4g\n',err_PS(iter));
     tic
     
-    % Run the RRR algorithm
+    % run the RRR algorithm
     [Xest_rrr, discrepancy_norm,err,err1, err2] = RRR(sqrt(PS),X_init,X,param);
     fprintf('RRR time = %.4g [sec] \n', toc);
     err_rrr(iter,:) = err;
     fprintf('error RRR = %.4g\n',err_rrr(iter,end));
     
-    % Save data of current iteration
+    % save data
     save(strcat('Xest_',num2str(iter),'.mat'),'Xest_rrr');
     save('err_PS','err_PS');
     save('err_rrr','err_rrr');
@@ -127,9 +134,10 @@ end
 
 %% Plotting the progress figure
 
-% Save the figure as a pdf
+% save the figure as a pdf
 save_pdf = 0;
-% Load saved data
+
+% load saved data
 load_data = 0;
 if load_data
     load('parameters.mat')
@@ -146,7 +154,7 @@ for i = 1:length(ind2save)
     err1 = norm(Xest_rrr - X,'fro')/norm(X(:));
     err2 = norm(rot90(Xest_rrr,2) - X,'fro')/norm(X(:));
     
-    % Correcting the reflection symmetry (if needed)
+    % correcting the reflection symmetry (if needed)
     if err2<err1 
         Xest_rrr = rot90(Xest_rrr,2);
     end

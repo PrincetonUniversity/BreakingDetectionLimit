@@ -10,6 +10,7 @@ function [Y, placed] = generate_clean_micrograph_2D(X, param)
 
 % Since we attempt placement at random, we need the end-result to be
 % quite sparse to have decent chances of finding m spots.
+
 %if N^2 < 10*m*W^2
 %    warning('BigMRA:gendata2D', ...
 %        'It may be difficult to get this many repetitions...');

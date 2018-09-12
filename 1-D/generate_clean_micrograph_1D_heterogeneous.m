@@ -1,4 +1,5 @@
 function [y, m_actual] = generate_clean_micrograph_1D_heterogeneous(X, W, n, m)
+
 % Inputs:
 %   X: K signals of length L in a matrix of size LxK
 %   W: separation zone has size Wx1: any contiguous subvector of that size

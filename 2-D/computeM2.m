@@ -1,6 +1,6 @@
 function M2_micrograph = computeM2(Y_obs,m_eff,param)
 
-% Given a batch of micrographs, compute their averaged second moment
+% Given a batch of micrographs, compute their averaged second-moment
 
 % Input:
 % Y_obs : a batch of noisy micrographs

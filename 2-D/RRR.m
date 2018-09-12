@@ -2,12 +2,13 @@ function [X_out, discrepancy_norm,err,err1,err2] = RRR(Y,X_init,X_true,param)
 
 % Given an estimation of the image's power spectrum, the RRR aims to find
 % the underlying image under the assumption that the image has nonzero
-% values only in the upper-left corner and the values of the image is
-% within [-1,1]. The algorithm is described is detail in:
-%1.  Elser, Veit. "Matrix product constraints by projection methods."
-%Journal of Global Optimization 68.2 (2017): 329-355.
-%2. Elser, Veit, Ti-Yen Lan, and Tamir Bendory. "Benchmark problems for phase retrieval."
-%arXiv preprint arXiv:1706.00399 (2017).
+% values only in the upper-left corner and the values of the image are
+% within [-1,1].
+% The algorithm is described is detail in:
+% 1.  Elser, Veit. "Matrix product constraints by projection methods."
+% Journal of Global Optimization 68.2 (2017): 329-355.
+% 2. Elser, Veit, Ti-Yen Lan, and Tamir Bendory. "Benchmark problems for phase retrieval."
+% arXiv preprint arXiv:1706.00399 (2017).
 
 % Input:
 % Y : the estimated Fourier magnitudes of the image (the square root of the
@@ -65,17 +66,19 @@ end
 %% Initializations
 
 discrepancy_norm = zeros(max_iter,1);
-err = discrepancy_norm;
-err1 = err;
-err2 = err;
+err = zeros(max_iter,1);
+err1 = zeros(max_iter,1);
+err2 = zeros(max_iter,1);
 X = X_init;
 
 %% RRR iterations
 
 for k = 1:max_iter
+    
     X1 = P1(X);
     X1 = P3(X1);
     
+    % compute error to ground truth to asses progress
     err1(k) = norm(X1(1:L,1:L) - X_true,'fro')/norm(X_true(:));
     err2(k) = norm(rot90(X1(1:L,1:L),2) - X_true,'fro')/norm(X_true(:));
     err(k) = min(err1(k),err2(k));
