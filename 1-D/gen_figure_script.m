@@ -26,6 +26,7 @@ error_gamma = abs(gamma - gamma_true)/abs(gamma_true);
 Markersize = 8;
 LN = 1.5;
 sample_vector = [3,6,9];
+
 ylim_min = -2.1;
 ylim_max = 2;
 

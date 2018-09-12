@@ -27,6 +27,7 @@ end
 % Pick K signals of length L 
 K = 1;
 L = 21;
+
 W = 2*L-1;
 
 % a "step" signal
