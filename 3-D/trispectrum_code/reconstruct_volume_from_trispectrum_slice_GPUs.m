@@ -36,20 +36,24 @@ num_pts = 100;
 Rots = sample_S2(num_pts);
 
 %% Compute true autocorrelations:
-
 % Precompute quantities for bispectrum and trispectrum slice (mainly inner
-% products of shifted PSWFs with centered ones):
+% products of shifted PSWFs with centered ones) on multiple GPUs:
 [psi_curr, curr_freqs, psi_lNs, q_list, D_mats, psi_freqs, a_sizes, psi_curr_k0] = ...
     precomp_for_autocorrs_from_projs_GPU(info.maxL, x_lists.s, info.L0, Rots);
 
-[G4, M4] = trispectrum_4tensor_grad_from_harmonics_projs(a_vec, psi_curr, psi_curr_k0, curr_freqs, psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, maxL);
+% Compute trispectrum slice:
+[G4, M4] = trispectrum_4tensor_grad_from_harmonics_projs(a_vec, psi_curr,...
+    psi_curr_k0, curr_freqs, psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, maxL);
 
 m4_micro = vec_cell(M4);
 
-[~, M3] = bispectrum_grad_from_harmonics_projs(a_vec, psi_curr, curr_freqs, psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, maxL);
+% Compute bispectrum:
+[~, M3] = bispectrum_grad_from_harmonics_projs(a_vec, psi_curr, curr_freqs,...
+    psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, maxL);
 
 m3_micro = vec_cell(M3);
 
+% Compute mean and power spectrum:
 q0 = q_list(1);
 [r,w] = lgwt(40*q0, 0, 1);
 M12_quants.w = w.*r;
@@ -64,10 +68,11 @@ m2_micro = power_spectrum_from_harmonics(a_vec, M12_quants.j_l, M12_quants.R_0n,
 
 m1_micro = mean_from_harmonics(a_vec, M12_quants.j_0, s_list(1), L);
 
+%% Recover volume:
 [a_lms_rec, gamma_rec] = recover_vol_coeffs_from_moments_projs_trispect_4tensor...
                     (m4_micro, m3_micro, m2_micro, m1_micro, maxL, L, r_cut, [], Rots);
 
-a_aligned = align_vol_coeffs(a_lms_rec, a_lms, 1e5, 1);
+a_aligned = align_vol_coeffs(a_lms_rec, a_lms, 1e5, 1); % align recovered and ground truth volumes
 
 norm(vec_cell(a_aligned) - a_vec)/norm(a_vec)
 

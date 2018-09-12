@@ -3,6 +3,18 @@ function [G, M] = trispectrum_4tensor_grad_from_harmonics_projs(a_lms, psi_curr,
 % Function to compute a 4-tensor slice through the trispectrum from a
 % number of projections.
 % 
+% Inputs:
+%   * a_lms: cell array of volume expansion coefficients
+%   * psi_curr, psi_curr_k0, curr_freqs, psi_lNs, q_list, D_mats,
+%   psi_freqs, a_sizes: Precomputed quantities from
+%   precomp_for_autocorrs_from_projs_GPU.m, see that file for details.
+%   * L: length of volume or projection
+%   * L_cutoff: cutoff for spherical harmonic expansion
+% 
+% Outputs:
+%   * G: gradient of trispectrum slice with respect to a_lms
+%   * M: trispectrum slice
+% 
 % Eitan Levin, August 2018
 
 num_coeffs = length(a_lms);

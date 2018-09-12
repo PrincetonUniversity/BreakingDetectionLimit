@@ -1,7 +1,39 @@
 function [psi_curr, curr_freqs, psi_lNs, q_list, D_mats, psi_freqs, a_sizes, psi_curr_k0] = ...
                                             precomp_for_autocorrs_from_projs_GPU(maxL, s_list, L, Rots)
 % Precomputation for computation of autocorrelations on multiple GPUs.
-
+% 
+% Inputs:
+%   * maxL: cutoff for spherical harmonics expansion
+%   * s_list: list of number of radial frequencies per order of spherical
+%   harmonics
+%   * L: length of volume or projection
+%   * Rots: stack of 3x3 rotation matrices representing viewing directions
+%   used to compute the bispectrum and trispectrum.
+% 
+% Outputs:
+%   * psi_curr: a Composite object with the part of the inner products
+%   between centered and shifted PSWFs on each worker
+%   * curr_freqs: a Composite with the angular frequencies corresponding
+%   to psi_curr on each worker
+%   * psi_lNs: Composite object with linear combinations of PSWFs already
+%   on the GPU assigned to each worker
+%   * q_list: list of number of radial frequencies for each angular
+%   frequency of centered PSWFs (in which the autocorrelations are
+%   expanded)
+%   * D_mats: Composite with Wigner-D matrices corresponding to Rots,
+%   already on the GPU of each worker.
+%   * psi_freqs: permutation vector used to permute the angular frequencies
+%   of the PSWFs sent to the workers to ensure that the computation time on
+%   all workers is approximately the same. (The issue arises because low
+%   angular frequencies contain more entries, so computations on them take
+%   more time.)
+%   * a_sizes: list of number of volume expansion coefficients for each
+%   order of spherical harmonics
+%   * psi_curr_k0: entries of psi_curr corresponding to zero-order centered
+%   PSWFs, needed on all workers to compute the slice of the trispectrum.
+%   It's a Composite and is already on the GPU of each worker.
+% 
+% Eitan Levin, August 2018
 
 beta_PSWF = 1; Trunc_img = 1e-5; Trunc_bispect = 1e-1;
 [psi_Nn, n_list] = PSWF_2D_full_cart(maxL, L, beta_PSWF, Trunc_img);

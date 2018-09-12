@@ -1,4 +1,31 @@
-function [F,J] = costgrad_lsqnonlin_projs(x, x_lists, L, M12_quants, M3_quants, m3_micro, m2_micro, m1_micro, lambda, L_cutoff)
+function [F,J] = costgrad_lsqnonlin_projs(x, x_lists, L, M12_quants, M3_quants,...
+    m3_micro, m2_micro, m1_micro, lambda, L_cutoff)
+% Evaluate cost and gradient of the cost, including first four
+% autocorrelations from the micrographs. 
+% 
+% Inputs:
+%   * x: current iterate. If a_lms is the vectorized coefficients of the 
+%   volume and gamma is the fraction of pixels on the micrograph occupied 
+%   by signal, x satisfes x = [real(a_lms); imag(a_lms); gamma].
+%   * x_lists: list of indices for the vectorized volume coefficients (see
+%   reconstruct_from_clean_autocorres_script.m for example)
+%   * L: length of the volume (or projection)
+%   * M12_quants: precomputed quantities for power spectrum and mean
+%   computations
+%   * M3_quants: precomputed quantities for bispectrum evaluation in a struct 
+%   (see precomp_for_autocorrs_from_projs_GPU.m)
+%   * m3_micro, m2_micro, m1_micro: bispectrum, power spectrum and mean 
+%   computed from the micrograph (see moments_from_micrograph_steerable.m)
+%   * lambda: weights for the three terms in the cost, where lambda(1)
+%   being the weight of the trispectrum difference, lambda(3) for bispectrum, 
+%   lambda(2) for power spectrum, and lambda(1) for the mean.
+%   * L_cutoff: cutoff for spherical harmonics expansion
+% 
+% Outputs:
+%   * F: vector such that the cost is given by norm(F)^2
+%   * J: Jacobian of F
+% 
+% Eitan Levin, August 2018
 
 % parse optimization variable:
 gamma = x(end);

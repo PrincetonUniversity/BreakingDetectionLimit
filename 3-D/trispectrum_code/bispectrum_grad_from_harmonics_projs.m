@@ -1,4 +1,20 @@
-function [G, M] = bispectrum_grad_from_harmonics_projs(a_lms, psi_curr, curr_freqs, psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, L_cutoff)
+function [G, M] = bispectrum_grad_from_harmonics_projs(a_lms, psi_curr,...
+    curr_freqs, psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, L_cutoff)
+% Compute the bispectrum and its gradient from projections.
+% 
+% Inputs:
+%   * a_lms: cell array of volume expansion coefficients
+%   * psi_curr, curr_freqs, psi_lNs, q_list, D_mats,
+%   psi_freqs, a_sizes: Precomputed quantities from
+%   precomp_for_autocorrs_from_projs_GPU.m, see that file for details.
+%   * L: length of volume or projection
+%   * L_cutoff: cutoff for spherical harmonic expansion
+% 
+% Outputs:
+%   * G: gradient of bispectrum with respect to a_lms
+%   * M: bispectrum
+% 
+% Eitan Levin, August 2018
 
 num_coeffs = length(a_lms);
 a_sizes = a_sizes(1:L_cutoff+1, :);
