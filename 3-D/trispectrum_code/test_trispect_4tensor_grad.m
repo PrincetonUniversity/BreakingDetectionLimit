@@ -40,11 +40,9 @@ Rots = sample_S2(num_pts);
 % Precompute quantities for bispectrum and trispectrum slice (mainly inner
 % products of shifted PSWFs with centered ones):
 [psi_curr, curr_freqs, psi_lNs, q_list, D_mats, psi_freqs, a_sizes, psi_curr_k0] = ...
-    precomp_for_bispect_from_projs(info.maxL, x_lists.s, info.L0, Rots);
+    precomp_for_autocorrs_from_projs_GPU(info.maxL, x_lists.s, info.L0, Rots);
 
-q_cutoff = q_list(1);
-
-[G4, M4] = trispectrum_4tensor_grad_from_harmonics_projs(a_vec, psi_curr, psi_curr_k0, curr_freqs, psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, maxL, q_cutoff);
+[G4, M4] = trispectrum_4tensor_grad_from_harmonics_projs(a_vec, psi_curr, psi_curr_k0, curr_freqs, psi_lNs, q_list, D_mats, L, psi_freqs, a_sizes, maxL);
 
 m4_micro = vec_cell(M4);
 
@@ -67,7 +65,7 @@ m2_micro = power_spectrum_from_harmonics(a_vec, M12_quants.j_l, M12_quants.R_0n,
 m1_micro = mean_from_harmonics(a_vec, M12_quants.j_0, s_list(1), L);
 
 [a_lms_rec, gamma_rec] = recover_vol_coeffs_from_moments_projs_trispect_4tensor...
-                    (m4_micro, m3_micro, m2_micro, m1_micro, maxL, L, r_cut, [], Rots, q_cutoff);
+                    (m4_micro, m3_micro, m2_micro, m1_micro, maxL, L, r_cut, [], Rots);
 
 a_aligned = align_vol_coeffs(a_lms_rec, a_lms, 1e5, 1);
 

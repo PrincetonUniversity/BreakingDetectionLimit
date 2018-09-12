@@ -1,4 +1,5 @@
-function [F,J] = costgrad_lsqnonlin_projs_trispect_4tensor(x, x_lists, L, M12_quants, M34_quants, m4_micro, m3_micro, m2_micro, m1_micro, lambda, L_cutoff, gamma, q_cutoff)
+function [F,J] = costgrad_lsqnonlin_projs_trispect_4tensor(x, x_lists, L,...
+    M12_quants, M34_quants, m4_micro, m3_micro, m2_micro, m1_micro, lambda, L_cutoff, gamma)
 
 % parse optimization variable:
 % gamma = x(end);
@@ -16,7 +17,10 @@ dm1 = gamma*m1_harms - m1_micro;
 
 % Compute gradient of trispectrum slice and bispectrum:
 
-[G_m4, m4_harms] = trispectrum_4tensor_grad_from_harmonics_projs(a_vec, M34_quants.psi_curr, M34_quants.psi_curr_k0, M34_quants.curr_freqs, M34_quants.psi_lNs, M34_quants.q_list, M34_quants.D_mats, L, M34_quants.psi_freqs, M34_quants.a_sizes, L_cutoff, q_cutoff);
+[G_m4, m4_harms] = trispectrum_4tensor_grad_from_harmonics_projs(a_vec,...
+    M34_quants.psi_curr, M34_quants.psi_curr_k0, M34_quants.curr_freqs,...
+    M34_quants.psi_lNs, M34_quants.q_list, M34_quants.D_mats, L,...
+    M34_quants.psi_freqs, M34_quants.a_sizes, L_cutoff);
 
 m4_harms = vec_cell(m4_harms);
 dm4 = gamma*m4_harms - m4_micro;

@@ -1,15 +1,34 @@
 function [a_lms, gamma] = recover_vol_coeffs_from_moments_projs_trispect_4tensor...
-                    (m4_micro, m3_micro, m2_micro, m1_micro, maxL, L, r_cut, a_init, Rots, q_cutoff)
+                    (m4_micro, m3_micro, m2_micro, m1_micro, maxL, L, r_cut, a_init, Rots)
+% Function to recover volume expansion coefficients and average fraction of
+% micrograph pixels occupied by signal, from the first three
+% autocorrelations, and a 4-tensor slice through the trispectrum.
+% 
+% Inputs:
+%   * m4_micro, m3_micro, m2_micro, m1_micro: First three autocorrelations
+%   and a 4-tensor slice through the trispectrum.
+%   * maxL: cutoff for spherical harmonics expansion
+%   * L: length of volume or projection
+%   * r_cut: assumed bandlimit (Nyquist is 1/2)
+%   * a_init: initialization, leave empty to use random initialization
+%   * Rots: stack of 3x3 rotations used to compute the autocorrelations
+%   (see sample_S2.m)
+% 
+% Outputs:
+%   * a_lms: cell array of volume expansion coefficients
+%   * gamma: recovered average number of micrograph pixels occupied by
+%   signal
+% 
+% Eitan Levin, August 2018
 
 % Get vectorization indices for the coefficients:
 x_lists.s = gen_s_list(maxL, r_cut, 1, floor(L/2));
 [x_lists.L, x_lists.m, ~, x_lists.p, x_lists.n] = gen_vec_coeff_lists(maxL, x_lists.s);
 
 % Precompute quantities for 3rd moment:
-
-%Rots = sample_S2(num_pts);
-
-[M34_quants.psi_curr, M34_quants.curr_freqs, M34_quants.psi_lNs, M34_quants.q_list, M34_quants.D_mats, M34_quants.psi_freqs, M34_quants.a_sizes, M34_quants.psi_curr_k0] = precomp_for_bispect_from_projs(maxL, x_lists.s, L, Rots);
+[M34_quants.psi_curr, M34_quants.curr_freqs, M34_quants.psi_lNs, M34_quants.q_list,...
+    M34_quants.D_mats, M34_quants.psi_freqs, M34_quants.a_sizes, M34_quants.psi_curr_k0] =...
+    precomp_for_autocorrs_from_projs_GPU(maxL, x_lists.s, L, Rots);
 
 % Get bases and quadrature for 1st and 2nd moment computations:
 q0 = M34_quants.q_list(1);
@@ -63,7 +82,7 @@ a_init = a_init(1:end-1);
 
 % Add slice of trispectrum:
 costgrad = @(x) costgrad_lsqnonlin_projs_trispect_4tensor(x, x_lists, L, M12_quants,...
-    M34_quants, m4_micro, m3_micro, m2_micro, m1_micro, lambda, maxL, gamma, q_cutoff);
+    M34_quants, m4_micro, m3_micro, m2_micro, m1_micro, lambda, maxL, gamma);
 
 saveFunc = @(x, optimValues, state) generic_saveFunc(x, optimValues, state, 'trispect_4tensor', iters_per_save);
 options = optimoptions('lsqnonlin', 'Jacobian', 'on', 'DerivativeCheck', 'off', 'Display', 'iter', 'TolX',1e-4, 'TolFun',1e-4, 'MaxIter', 1e4, 'OutputFcn', saveFunc);

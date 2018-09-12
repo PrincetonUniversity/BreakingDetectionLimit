@@ -1,6 +1,7 @@
 function [psi_curr, curr_freqs, psi_lNs, q_list, D_mats, psi_freqs, a_sizes, psi_curr_k0] = ...
-                                            precomp_for_bispect_from_projs(maxL, s_list, L, Rots)
-% Precomputation for bispectrum from projections
+                                            precomp_for_autocorrs_from_projs_GPU(maxL, s_list, L, Rots)
+% Precomputation for computation of autocorrelations on multiple GPUs.
+
 
 beta_PSWF = 1; Trunc_img = 1e-5; Trunc_bispect = 1e-1;
 [psi_Nn, n_list] = PSWF_2D_full_cart(maxL, L, beta_PSWF, Trunc_img);
