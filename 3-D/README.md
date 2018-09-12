@@ -10,11 +10,11 @@
 
 #### Main functions:
 
-1. 'reconstruct_from_clean_autocorrs_script.m': Script to load a volume, generate its clean first three autocorrelations, and inverts them to recover the volume. 
-2. 'moments_from_micrographs_script.m': Script to load micrographs and compute the average first three autocorrelations of the dataset.
-3. 'pure_noise_moments_script.m': Script to compute autocorrelations from pure-noise micrographs.
-4. 'pure_noise_detection_script.m': After running scripts 2. & 3., run this script to recover the predicted number of projections per micrograph, and hence to detect pure noise micrographs.
-5. 'precomp_B_factors_script.m': Script to precompute quantities needed for bispectrum evaluation.
+1. **reconstruct_from_clean_autocorrs_script.m**: Script to load a volume, generate its clean first three autocorrelations, and inverts them to recover the volume. 
+2. **moments_from_micrographs_script.m**: Script to load micrographs and compute the average first three autocorrelations of the dataset.
+3. **pure_noise_moments_script.m**: Script to compute autocorrelations from pure-noise micrographs.
+4. **pure_noise_detection_script.m**: After running scripts 2. & 3., run this script to recover the predicted number of projections per micrograph, and hence to detect pure noise micrographs.
+5. **precomp_B_factors_script.m**: Script to precompute quantities needed for bispectrum evaluation.
 
 ##### Misc. Code
 We include code in trispectrum_code which was not used for the paper, but might be useful for future extensions. 
