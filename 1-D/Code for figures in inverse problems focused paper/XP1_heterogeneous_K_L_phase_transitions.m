@@ -50,6 +50,7 @@ for iter_K = 1 : length(Ks)
         x_true = randn(L, K);
         y = reshape([x_true ; zeros(2*L, K)], 3*L*K, 1); % the perfect micrograph; 1*L might be enough.
         gamma0 = ones(1, K)*(2*L-1)/length(y);
+		gamma_fixed = true; % !! gamma is known and fixed in this experiment
         n_init_optim = 1;
         
         parfor repeat = 1 : nrepeats
@@ -57,7 +58,7 @@ for iter_K = 1 : length(Ks)
             % Solve from a new random initial guess.
             t = tic();
             result = micrographMRA_heterogeneous(y, 0, L, K, list2, list3, ...
-                                                 [], gamma0, n_init_optim);
+                                    [], gamma0, gamma_fixed, n_init_optim);
             t = toc(t);
 
             % Evaluate quality of recovery, up to permutations and shifts.

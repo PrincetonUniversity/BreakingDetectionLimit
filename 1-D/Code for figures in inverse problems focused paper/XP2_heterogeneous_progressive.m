@@ -9,7 +9,8 @@ K = 3;
 L = 21; % make this 21
 W = 2*L-1;
 X = zeros(L, K);
-X(:, 1) = [ones(ceil(L/2), 1) ; -ones(floor(L/2), 1)];
+% X(:, 1) = [ones(ceil(L/2), 1) ; -ones(floor(L/2), 1)];
+X(:, 1) = circshift([ones(ceil(L/2), 1) ; zeros(floor(L/2), 1)], floor(L/4));
 X(:, 2) = [linspace(1, -1, ceil(L/2))' ; linspace(-1, 1, floor(L/2))'];
 X(:, 3) = randn(L, 1);
 
@@ -43,7 +44,7 @@ SNR = norm(y_clean, 'fro')/norm(y_obs-y_clean, 'fro');
 ns = unique(round(logspace(8, log10(n), 9)));  % first input should be 8
 
 % How many times do we optimize from a different random initial guess?
-n_init_optim = 3;
+n_init_optim = 10;
 
 for iter = 1 : length(ns)
     
@@ -69,6 +70,7 @@ for iter = 1 : length(ns)
     sigma_est = [];
     X0 = [];
     gamma0 = []; % True value is: m_actual*L_optim/n
+    gamma_fixed = false; % Optimize for gamma as well as for the signals
     
     % Run the optimization from different random initializations n_repeat
     % times, and keep the best result according to the cost value of X2.
@@ -78,7 +80,7 @@ for iter = 1 : length(ns)
     for repeat = 1 : n_init_optim
         T = tic();
         [X2, gamma2, X1, gamma1, X1_L, cost_X2] = heterogeneous_1D( ...
-                            moments, K, L, L_optim, sigma_est, X0, gamma0);
+               moments, K, L, L_optim, sigma_est, X0, gamma0, gamma_fixed);
         time_to_optimize(repeat) = toc(T);
         costs(repeat) = cost_X2;
         if cost_X2 < result.cost_X2
@@ -104,6 +106,8 @@ for iter = 1 : length(ns)
     % Save in a structure array.
     results(iter) = result; %#ok<SAGROW>
     
+    fprintf('\n\n\n ** done %d/%d ** \n\n\n', iter, length(ns));
+    
 end
 
 clear y_clean y_obs;
@@ -111,6 +115,16 @@ clear y_clean y_obs;
 ID = randi(1000000);
 fprintf('\n\nThis XP ID: %d\n\n', ID);
 save(sprintf('heterogeneous_progressive_n%d_%d.mat', n, ID));
+
+%%
+% For the experiment where X(:, 1) has zero padding (akin to over-estimated
+% support size), we need to cyclically align th eestimator to the ground
+% truth, as this cyclic shift is unidentifiable.
+for nn = 1 : 9
+    X2 = results(nn).X2;
+    X2(:, 1) = align_to_reference_1D(X2(:, 1), X(:, 1));
+    results(nn).X2 = X2;
+end
 
 %%
 figure(1);

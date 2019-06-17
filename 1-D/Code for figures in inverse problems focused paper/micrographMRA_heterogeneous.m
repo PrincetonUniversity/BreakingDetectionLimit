@@ -1,8 +1,8 @@
 function result = micrographMRA_heterogeneous(y, sigma, L, K, list2, list3, ...
-                                              X0, gamma0, n_init_optim)
+                                     X0, gamma0, gamma_fixed, n_init_optim)
 
 
-    % Collect the moments for the first bit of the micrograph.
+    % Collect the moments from the micrograph.
     T = tic();
     [M1, M2, M3] = moments_from_data_no_debias_1D_batch(y, list2, list3, 1e8);    
     %! We normalize here.
@@ -24,6 +24,11 @@ function result = micrographMRA_heterogeneous(y, sigma, L, K, list2, list3, ...
     if ~exist('gamma0', 'var')
         gamma0 = []; % True value is: m_actual*L_optim/length(y)
     end
+    % By default, we optimize over gamma as well: set this flag to 'true'
+    % if you prefer to fix the value of gamma.
+    if ~exist('gamma_fixed', 'var') || isempty(gamma_fixed)
+        gamma_fixed = false;
+    end
     % How many initializations for the optimization?
     if ~exist('n_init_optim', 'var') || isempty(n_init_optim)
         n_init_optim = 1;
@@ -37,7 +42,7 @@ function result = micrographMRA_heterogeneous(y, sigma, L, K, list2, list3, ...
     for repeat = 1 : n_init_optim
         T = tic();
         [X2, gamma2, X1, gamma1, X1_L, cost_X2, problem] = heterogeneous_1D( ...
-                            moments, K, L, L_optim, sigma_est, X0, gamma0);
+               moments, K, L, L_optim, sigma_est, X0, gamma0, gamma_fixed);
         time_to_optimize(repeat) = toc(T);
         costs(repeat) = cost_X2;
         if cost_X2 < result.cost_X2

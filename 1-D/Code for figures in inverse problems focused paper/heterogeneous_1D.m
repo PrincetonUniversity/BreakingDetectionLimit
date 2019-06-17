@@ -1,4 +1,4 @@
-function [X2, gamma2, X1, gamma1, X1_L, cost_X2, problem] = heterogeneous_1D(moments, K, L, L_optim, sigma_est, X0, gamma0)
+function [X2, gamma2, X1, gamma1, X1_L, cost_X2, problem] = heterogeneous_1D(moments, K, L, L_optim, sigma_est, X0, gamma0, gamma_fixed)
 % Estimate K signals of length L from moments, with an intermediate
 % optimization through signals of length L_optim.
 %
@@ -18,6 +18,7 @@ function [X2, gamma2, X1, gamma1, X1_L, cost_X2, problem] = heterogeneous_1D(mom
 %
 % gamma0: K x 1, initial guess at each signal's density in the observation.
 %
+% gamma_fixed: set to true if gamma = gamma0 is fixed (false by default)
 % 
 % Outputs:
 %
@@ -50,9 +51,15 @@ function [X2, gamma2, X1, gamma1, X1_L, cost_X2, problem] = heterogeneous_1D(mom
         gamma0 = .1*ones(K, 1)/K;
     end
     
+    % By default, we optimize over gamma as well: set this flag to 'true'
+    % if you prefer to fix the value of gamma.
+    if ~exist('gamma_fixed', 'var') || isempty(gamma_fixed)
+        gamma_fixed = false;
+    end
+    
     % First optimization round.
     [X1, gamma1, problem] = least_squares_1D_heterogeneous(moments, ...
-                                     L_optim, K, sigma_est, X0, gamma0(:));
+                        L_optim, K, sigma_est, X0, gamma0(:), gamma_fixed);
 
     % Extract best subsignals of length L (with cyclic indexing) in
     % each estimated signal.
@@ -72,7 +79,7 @@ function [X2, gamma2, X1, gamma1, X1_L, cost_X2, problem] = heterogeneous_1D(mom
 
     % Second optimization round.
     [X2, gamma2, problem, ~, cost_X2] = least_squares_1D_heterogeneous( ...
-                                            moments, L, K, sigma_est, ...
-                                            X1_L, gamma2_0(:));
+                                           moments, L, K, sigma_est, ...
+                                           X1_L, gamma2_0(:), gamma_fixed);
 
 end
