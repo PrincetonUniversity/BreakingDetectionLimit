@@ -24,7 +24,7 @@ I = sigma*randn(M, M, num_micros);
 % Compute moments:
 disp('Computing moments')
 pad_len = 256 - 2*(L-1);
-[m1, m2, m3] = moments_from_micrograph_steerable_windows_manyGPUs(I, L, pad_len);
+[m1, m2, m3] = moments_from_micrograph_steerable(I, L, pad_len);
     
 % Debias moments:
 disp('Debiasing')
